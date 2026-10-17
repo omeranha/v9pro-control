@@ -134,17 +134,20 @@ partial class MainForm
 		// 
 		// lblBattery
 		// 
-		lblBattery.AutoSize = true;
+		// Fixed width, not AutoSize: the longest states ("dongle not found" at 143px,
+		// "100% (charging)" at 136px) would otherwise grow the label under the Refresh button.
+		// AutoEllipsis keeps anything unexpected inside its own bounds.
+		lblBattery.AutoEllipsis = true;
 		lblBattery.Location = new Point(16, 27);
 		lblBattery.Name = "lblBattery";
-		lblBattery.Size = new Size(62, 15);
+		lblBattery.Size = new Size(150, 15);
 		lblBattery.TabIndex = 0;
 		lblBattery.Text = "Battery: —";
 		// 
 		// btnBatteryRefresh
 		// 
 		btnBatteryRefresh.FlatStyle = FlatStyle.Flat;
-		btnBatteryRefresh.Location = new Point(108, 22);
+		btnBatteryRefresh.Location = new Point(174, 22);
 		btnBatteryRefresh.Name = "btnBatteryRefresh";
 		btnBatteryRefresh.Size = new Size(75, 25);
 		btnBatteryRefresh.TabIndex = 1;
@@ -155,7 +158,7 @@ partial class MainForm
 		// lblSoundMode
 		// 
 		lblSoundMode.AutoSize = true;
-		lblSoundMode.Location = new Point(203, 27);
+		lblSoundMode.Location = new Point(265, 27);
 		lblSoundMode.Name = "lblSoundMode";
 		lblSoundMode.Size = new Size(78, 15);
 		lblSoundMode.TabIndex = 2;
@@ -166,7 +169,7 @@ partial class MainForm
 		cboSoundMode.DropDownStyle = ComboBoxStyle.DropDownList;
 		cboSoundMode.FlatStyle = FlatStyle.Flat;
 		cboSoundMode.Items.AddRange(new object[] { "Game mode 1", "Game mode 2", "Music mode" });
-		cboSoundMode.Location = new Point(287, 23);
+		cboSoundMode.Location = new Point(351, 23);
 		cboSoundMode.Name = "cboSoundMode";
 		cboSoundMode.Size = new Size(160, 23);
 		cboSoundMode.TabIndex = 3;
@@ -446,7 +449,7 @@ partial class MainForm
 		grpEqualizer.Size = new Size(600, 228);
 		grpEqualizer.TabIndex = 2;
 		grpEqualizer.TabStop = false;
-		grpEqualizer.Text = "Equalizer (10 band, dB)";
+		grpEqualizer.Text = "Equalizer";
 		// 
 		// chkEqualizerEnabled
 		// 

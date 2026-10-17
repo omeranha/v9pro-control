@@ -2,6 +2,22 @@ using System.Runtime.InteropServices;
 
 namespace V9ProControl.Apo;
 
+/// <summary>Why opening the library failed, so the UI can say something true about it.</summary>
+internal enum OsConfLibStatus
+{
+	Ready,
+
+	/// <summary>osConfLib.dll is not beside the executable nor in an installed MCHOSE HUB.</summary>
+	LibraryMissing,
+
+	/// <summary>The library loaded but would not initialise.</summary>
+	InitFailed,
+
+	/// <summary>The library initialised but enumerated no devices, which is what happens
+	/// while the headset has no active audio endpoint.</summary>
+	NoDevice
+}
+
 /// <summary>Property type expected in PropertyControl's trailing byte. Zero is invalid and makes the library fail fast.</summary>
 internal enum ApoPropertyType : byte
 {
@@ -44,37 +60,60 @@ internal sealed class OsConfLib : IDisposable
 	private OsConfLib(IntPtr deviceInfo) => _deviceInfo = deviceInfo;
 
 	/// <summary>
-	/// Loads the library and selects the render device, or returns null when unavailable.
+	/// Loads the library and selects the render device. Reports why it failed rather than just
+	/// returning null: a missing DLL and a headset with no audio endpoint are different
+	/// problems, and conflating them sends you looking for the wrong thing.
 	/// Looks beside the executable first so the DLL can be kept locally and MCHOSE HUB
 	/// uninstalled.
 	/// </summary>
-	public static OsConfLib? TryOpen()
+	public static OsConfLib? TryOpen(out OsConfLibStatus status)
 	{
 		string? directory = ResolveLibraryDirectory();
-		if (directory is null) { return null; }
+		if (directory is null)
+		{
+			status = OsConfLibStatus.LibraryMissing;
+			return null;
+		}
 
 		try
 		{
-			if (!SetDllDirectory(directory)) { return null; }
-			if (ConfLibInitWithGUID(DriverInterface) != 0) { return null; }
-			if (CreateDeviceList() != 0) { return null; }
+			if (!SetDllDirectory(directory) || ConfLibInitWithGUID(DriverInterface) != 0)
+			{
+				status = OsConfLibStatus.InitFailed;
+				return null;
+			}
+
+			// From here the library holds state, so every failure path has to unwind it. The
+			// caller retries on a timer while the headset is absent, and leaving initialised
+			// instances behind would accumulate.
+			if (CreateDeviceList() != 0)
+			{
+				ConfLibUnInit();
+				status = OsConfLibStatus.InitFailed;
+				return null;
+			}
 
 			IntPtr info = Marshal.AllocHGlobal(DeviceInfoSize);
 			for (int i = 0; i < DeviceInfoSize; i++) { Marshal.WriteByte(info, i, 0); }
 			if (GetDeviceById(RenderDeviceType, 0, info) != 0)
 			{
 				Marshal.FreeHGlobal(info);
+				ConfLibUnInit();
+				status = OsConfLibStatus.NoDevice;
 				return null;
 			}
 
+			status = OsConfLibStatus.Ready;
 			return new OsConfLib(info);
 		}
 		catch (DllNotFoundException)
 		{
+			status = OsConfLibStatus.LibraryMissing;
 			return null;
 		}
 		catch (EntryPointNotFoundException)
 		{
+			status = OsConfLibStatus.InitFailed;
 			return null;
 		}
 	}

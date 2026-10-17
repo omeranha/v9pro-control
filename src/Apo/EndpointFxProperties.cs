@@ -12,6 +12,8 @@ internal sealed class EndpointFxProperties
 {
 	private const string MmDevicesRoot = @"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio";
 	private const string DeviceDescriptionValue = "{b3f8fa53-0004-438e-9003-51a46e139bfc},6";
+	private const string DeviceStateValue = "DeviceState";
+	private const int DeviceStateActive = 0x1;
 
 	private readonly string _fxPropertiesPath;
 
@@ -25,15 +27,29 @@ internal sealed class EndpointFxProperties
 		Description = description;
 	}
 
+	/// <summary>
+	/// Locates the endpoint's effect settings, preferring the active one.
+	///
+	/// Reinstalling the driver leaves the previous endpoints registered but not present, each
+	/// keeping its own FxProperties. Returning the first name match therefore read a dead
+	/// endpoint holding stale defaults while osConfLib applied changes to the live device, so
+	/// settings appeared to reset every time the app started. Inactive endpoints are only used
+	/// as a fallback, for when the headset is registered but currently disconnected.
+	/// </summary>
 	public static EndpointFxProperties? Find(DeviceFlow flow, string descriptionFilter)
 	{
 		string flowKey = flow == DeviceFlow.Render ? "Render" : "Capture";
 		using RegistryKey? root = Registry.LocalMachine.OpenSubKey($@"{MmDevicesRoot}\{flowKey}");
 		if (root is null) { return null; }
 
+		EndpointFxProperties? inactive = null;
+
 		foreach (string endpointId in root.GetSubKeyNames())
 		{
-			using RegistryKey? properties = root.OpenSubKey($@"{endpointId}\Properties");
+			using RegistryKey? endpoint = root.OpenSubKey(endpointId);
+			if (endpoint is null) { continue; }
+
+			using RegistryKey? properties = endpoint.OpenSubKey("Properties");
 			string? description = properties?.GetValue(DeviceDescriptionValue) as string;
 			if (description is null || !description.Contains(descriptionFilter, StringComparison.OrdinalIgnoreCase)) { continue; }
 
@@ -41,11 +57,15 @@ internal sealed class EndpointFxProperties
 			using RegistryKey? fx = Registry.LocalMachine.OpenSubKey(fxPath);
 			if (fx is null) { continue; }
 
-			return new EndpointFxProperties(fxPath, endpointId, description);
+			var candidate = new EndpointFxProperties(fxPath, endpointId, description);
+			if (IsActive(endpoint)) { return candidate; }
+			inactive ??= candidate;
 		}
 
-		return null;
+		return inactive;
 	}
+
+	private static bool IsActive(RegistryKey endpoint) => endpoint.GetValue(DeviceStateValue) is int state && (state & DeviceStateActive) == DeviceStateActive;
 
 	/// <summary>
 	/// Reads a DWORD effect value. Gains are stored as two's-complement DWORDs, so -2 comes

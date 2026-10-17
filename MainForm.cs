@@ -8,6 +8,7 @@ namespace V9ProControl;
 public partial class MainForm : Form
 {
 	private const string DeviceFilter = "MCHOSE V9 PRO";
+	private const int ApoRetrySeconds = 5;
 
 	private static readonly int[] FlatCurve = new int[Equalizer.BandCount];
 
@@ -21,6 +22,7 @@ public partial class MainForm : Form
 	private bool _suppressEvents;
 	private bool _batteryBusy;
 	private bool _fxAvailable;
+	private int _ticksSinceApoRetry;
 
 	public MainForm()
 	{
@@ -64,23 +66,32 @@ public partial class MainForm : Form
 
 	private void ConnectFxEffects()
 	{
+		_apo?.Dispose();
+		_apo = null;
+
 		EndpointFxProperties? fx = EndpointFxProperties.Find(DeviceFlow.Render, DeviceFilter);
 		if (fx is null) {
+			_equalizer = null;
+			_effects = null;
 			SetFxControlsEnabled(false);
-			SetStatus("Effects unavailable: no APO settings found for the headset.");
+			SetStatus("Headset has no audio endpoint yet — connect it, or replug the dongle after a driver install.");
 			return;
 		}
 
 		// Without this the registry write persists but the running APO never re-reads it.
-		_apo = OsConfLib.TryOpen();
+		_apo = OsConfLib.TryOpen(out OsConfLibStatus apoStatus);
 
 		_equalizer = new Equalizer(fx, _apo);
 		_effects = new PlaybackEffects(fx, _apo);
 		LoadFxEffects();
 
-		SetStatus(_apo is not null
-			? "Effects and EQ apply immediately (osConfLib)."
-			: "osConfLib not found — settings are saved but only apply after replugging the headset.");
+		SetStatus(apoStatus switch
+		{
+			OsConfLibStatus.Ready => "Effects and EQ apply immediately (osConfLib).",
+			OsConfLibStatus.LibraryMissing => "osConfLib.dll not found — settings are saved but only apply after replugging the headset.",
+			OsConfLibStatus.NoDevice => "Headset audio endpoint is not active — settings are saved but will not apply yet.",
+			_ => "osConfLib failed to initialise — settings are saved but only apply after replugging the headset."
+		});
 	}
 
 	private void ConnectHeadset()
@@ -230,9 +241,12 @@ public partial class MainForm : Form
 		if (lblBattery.Text.EndsWith('—')) { lblBattery.Text = "Battery: reading…"; }
 		try {
 			BatteryReading? reading = await Task.Run(() => _headset.ReadBattery());
-			lblBattery.Text = reading is null
-				? "Battery: unavailable (headset off or out of range)"
-				: $"Battery: {reading.Value.Describe()}";
+			if (reading is null) {
+				lblBattery.Text = "Battery: out of range";
+				SetStatus("Battery unavailable — the headset is off or out of range.");
+			} else {
+				lblBattery.Text = $"Battery: {reading.Value.Describe()}";
+			}
 		} catch (Exception ex) {
 			lblBattery.Text = "Battery: read failed";
 			SetStatus($"Battery read failed: {ex.Message}");
@@ -284,7 +298,29 @@ public partial class MainForm : Form
 
 	private void SetStatus(string message) => lblStatus.Text = message;
 
-	private void OnRefreshTick(object? sender, EventArgs e) => RefreshValues();
+	private void OnRefreshTick(object? sender, EventArgs e)
+	{
+		RefreshValues();
+
+		// A driver install or a replug creates a new endpoint, so the APO connection is retried
+		// instead of leaving effects dead until the app is restarted.
+		if (_apo is null && ++_ticksSinceApoRetry >= ApoRetrySeconds) {
+			_ticksSinceApoRetry = 0;
+			ReconnectDevice();
+		}
+	}
+
+	/// <summary>Re-resolves the endpoints and the APO after the headset appears or changes.</summary>
+	private void ReconnectDevice()
+	{
+		_outputEndpoint?.Dispose();
+		_micEndpoint?.Dispose();
+		_outputEndpoint = null;
+		_micEndpoint = null;
+
+		ConnectEndpoints();
+		ConnectFxEffects();
+	}
 
 	private async void OnBatteryRefresh(object? sender, EventArgs e)
 	{
