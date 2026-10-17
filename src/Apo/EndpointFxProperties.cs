@@ -87,7 +87,38 @@ internal sealed class EndpointFxProperties
 	}
 
 	/// <summary>
-	/// Writes a DWORD effect value. Requires administrator rights.
+	/// True when the value exists and is stored as a DWORD. A write that reports success but
+	/// lands as REG_BINARY has gone through an interface that did not understand it, and the
+	/// APO ignores the result, so the distinction matters.
+	/// </summary>
+	public bool IsDwordValue(Guid propertySet, int index)
+	{
+		using RegistryKey? fx = Registry.LocalMachine.OpenSubKey(_fxPropertiesPath);
+		return fx?.GetValueKind(ValueName(propertySet, index)) == RegistryValueKind.DWord;
+	}
+
+	/// <summary>Property set and index of the first DWORD value present, for probing writes.</summary>
+	public (Guid Set, int Index)? FirstDwordValue()
+	{
+		using RegistryKey? fx = Registry.LocalMachine.OpenSubKey(_fxPropertiesPath);
+		if (fx is null) { return null; }
+
+		foreach (string name in fx.GetValueNames())
+		{
+			if (fx.GetValueKind(name) != RegistryValueKind.DWord) { continue; }
+
+			int comma = name.LastIndexOf(',');
+			if (comma <= 2 || !int.TryParse(name.AsSpan(comma + 1), out int index)) { continue; }
+			if (!Guid.TryParse(name.Substring(0, comma).Trim('{', '}'), out Guid set)) { continue; }
+
+			return (set, index);
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// Writes a DWORD effect value. Requires administrator rights.</summary>
 	///
 	/// The key must be opened asking for only SetValue + QueryValues: Administrators are
 	/// granted SetValue and ReadKey but NOT CreateSubKey, so the usual writable:true open

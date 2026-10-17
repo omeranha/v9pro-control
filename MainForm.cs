@@ -16,7 +16,7 @@ public partial class MainForm : Form
 	private AudioEndpoint? _micEndpoint;
 	private Equalizer? _equalizer;
 	private PlaybackEffects? _effects;
-	private OsConfLib? _apo;
+	private ApoWriter? _apo;
 	private Headset? _headset;
 
 	private bool _suppressEvents;
@@ -79,18 +79,21 @@ public partial class MainForm : Form
 		}
 
 		// Without this the registry write persists but the running APO never re-reads it.
-		_apo = OsConfLib.TryOpen(out OsConfLibStatus apoStatus);
+		_apo = new ApoWriter(fx);
 
 		_equalizer = new Equalizer(fx, _apo);
 		_effects = new PlaybackEffects(fx, _apo);
 		LoadFxEffects();
 
-		SetStatus(apoStatus switch
+		SetStatus(_apo.Method switch
 		{
-			OsConfLibStatus.Ready => "Effects and EQ apply immediately (osConfLib).",
-			OsConfLibStatus.LibraryMissing => "osConfLib.dll not found — settings are saved but only apply after replugging the headset.",
-			OsConfLibStatus.NoDevice => "Headset audio endpoint is not active — settings are saved but will not apply yet.",
-			_ => "osConfLib failed to initialise — settings are saved but only apply after replugging the headset."
+			ApoApplyMethod.OsConfLib => "Effects and EQ apply immediately (osConfLib).",
+			ApoApplyMethod.PolicyConfig => "Effects and EQ apply immediately (audio policy interface).",
+			_ => _apo.LibraryStatus switch
+			{
+				OsConfLibStatus.NoDevice => "Headset audio endpoint is not active — settings are saved but will not apply yet.",
+				_ => "Settings are saved but only apply after replugging the headset."
+			}
 		});
 	}
 
@@ -304,7 +307,7 @@ public partial class MainForm : Form
 
 		// A driver install or a replug creates a new endpoint, so the APO connection is retried
 		// instead of leaving effects dead until the app is restarted.
-		if (_apo is null && ++_ticksSinceApoRetry >= ApoRetrySeconds) {
+		if ((_apo is null || !_apo.AppliesLive) && ++_ticksSinceApoRetry >= ApoRetrySeconds) {
 			_ticksSinceApoRetry = 0;
 			ReconnectDevice();
 		}

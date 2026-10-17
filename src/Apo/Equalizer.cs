@@ -33,22 +33,18 @@ internal sealed class Equalizer
 	public static readonly string[] BandLabels = { "20", "60", "100", "250", "500", "1k", "2k", "4k", "8k", "20k" };
 
 	private readonly EndpointFxProperties _fx;
-	private readonly OsConfLib? _apo;
+	private readonly ApoWriter _writer;
 
-	public Equalizer(EndpointFxProperties fx, OsConfLib? apo)
+	public Equalizer(EndpointFxProperties fx, ApoWriter writer)
 	{
 		_fx = fx;
-		_apo = apo;
+		_writer = writer;
 	}
 
 	public bool IsEnabled
 	{
 		get => (_fx.ReadInt32(PropertySet, EnableIndex) ?? 0) != 0;
-		set
-		{
-			if (_apo is not null && _apo.TrySet(EnableName, value ? 1 : 0, ApoPropertyType.Bool)) { return; }
-			_fx.WriteInt32(PropertySet, EnableIndex, value ? 1 : 0);
-		}
+		set => _writer.Write(PropertySet, EnableIndex, value ? 1 : 0, EnableName, ApoPropertyType.Bool);
 	}
 
 	public int GetBand(int band)
@@ -58,16 +54,14 @@ internal sealed class Equalizer
 	}
 
 	/// <summary>
-	/// Pushes one band to the APO. A successful osConfLib call updates FxProperties itself,
-	/// so the registry write is only the fallback for when the library is unavailable.
+	/// Pushes one band to the APO. The writer applies it live when it can and falls back to a
+	/// plain registry write otherwise.
 	/// </summary>
 	public void SetBand(int band, int gainDb)
 	{
 		ValidateBand(band);
 		int gain = Math.Clamp(gainDb, MinGainDb, MaxGainDb);
-
-		if (_apo is not null && _apo.TrySet(BandName(band), gain, ApoPropertyType.Int)) { return; }
-		_fx.WriteInt32(PropertySet, FirstBandIndex + band, gain);
+		_writer.Write(PropertySet, FirstBandIndex + band, gain, BandName(band), ApoPropertyType.Int);
 	}
 
 	public int[] ReadAllBands()

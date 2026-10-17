@@ -63,16 +63,16 @@ internal sealed class PlaybackEffects
 	public const int MaxIntelligentVolumeMode = 1;
 
 	private readonly EndpointFxProperties _fx;
-	private readonly OsConfLib? _apo;
+	private readonly ApoWriter _writer;
 
-	public PlaybackEffects(EndpointFxProperties fx, OsConfLib? apo)
+	public PlaybackEffects(EndpointFxProperties fx, ApoWriter writer)
 	{
 		_fx = fx;
-		_apo = apo;
+		_writer = writer;
 	}
 
 	/// <summary>True when changes reach the running APO instead of only being persisted.</summary>
-	public bool AppliesLive => _apo is not null;
+	public bool AppliesLive => _writer.AppliesLive;
 
 	public bool BrighteningEnabled
 	{
@@ -141,11 +141,7 @@ internal sealed class PlaybackEffects
 	}
 
 	/// <summary>Applies through the APO when possible, falling back to a plain registry write.</summary>
-	private void Write(string property, int index, int value, ApoPropertyType type)
-	{
-		if (_apo is not null && _apo.TrySet(property, value, type)) { return; }
-		_fx.WriteInt32(PropertySet, index, value);
-	}
+	private void Write(string property, int index, int value, ApoPropertyType type) => _writer.Write(PropertySet, index, value, property, type);
 
 	private bool ReadFlag(int index) => (_fx.ReadInt32(PropertySet, index) ?? 0) != 0;
 
