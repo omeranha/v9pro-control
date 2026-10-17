@@ -8,7 +8,8 @@ replace the vendor's MCHOSE HUB.
 MCHOSE HUB works, but it is an Electron app that fetches its entire interface from
 `cdn.mchose.com.cn` at startup, reports telemetry, and keeps background watcher processes
 alive. Every setting it changes is in fact a local Windows audio property, so none of that is
-necessary. This app does the same work in a single ~200 KB executable with no network access.
+necessary. This app does the same work in a single window with no network access, and needs
+nothing from MCHOSE but the driver.
 
 ## What it does
 
@@ -40,10 +41,25 @@ anywhere, so it was mapped by diffing that key while toggling one control at a t
 Hub. `src/Apo/Equalizer.cs` and `src/Apo/PlaybackEffects.cs` record what each index means.
 
 Writing the registry alone only persists a value; the running APO does not re-read it until
-the audio stream restarts. To apply changes live the app calls `PropertyControl` in the
-vendor's `osConfLib.dll`, addressing each setting by name (`Enable_EQ_GFX`, `EQ_Slider1` …
-`EQ_Slider10`, `AUDIOBRILLIANT_LEVEL`, and so on). Those names were read out of the library's
-own string table. The registry write remains as a fallback when the library is not present.
+the audio stream restarts. To apply changes live the app writes through the audio service's own
+policy interface (`IPolicyConfig::SetPropertyValue`), targeting the endpoint's FX property
+store. A `PROPERTYKEY` is exactly the `{GUID},index` pair above, so the mapped property sets
+address it directly. The variant type has to be `VT_UI4`: the service unwraps that into a
+`REG_DWORD`, whereas `VT_I4` is accepted and stored as a raw binary blob the APO ignores.
+
+That path was found by watching what the vendor library does rather than by guessing. Hooking
+its imports showed it issues no `DeviceIoControl`, no `CreateFileW` and no registry writes — it
+is pure COM. Patching the live vtable of the object it creates then showed every change going
+through one slot, carrying the endpoint id, an FX-store flag, a `PROPERTYKEY` and a
+`PROPVARIANT`.
+
+`IPolicyConfig` is undocumented and its vtable layout is not guaranteed across Windows builds,
+so the app proves it before relying on it: one existing value is written back over itself and
+re-read, checking both the value and that it is still a `REG_DWORD`. If that fails the value is
+repaired and the app falls back. `src/Apo/ApoWriter.cs` holds that decision.
+
+When `osConfLib.dll` from MCHOSE HUB happens to be present, it is preferred — it ships with the
+driver and is matched to it, so it carries no layout risk. It is no longer required.
 
 Battery level and sound mode are not audio properties at all — they are vendor HID reports on
 usage page `0xFF90`, exchanged with the USB dongle (`src/Device/`).
@@ -54,10 +70,11 @@ usage page `0xFF90`, exchanged with the USB dongle (`src/Device/`).
 - .NET 10 SDK to build
 - Administrator rights at runtime, because `FxProperties` is only writable by elevated
   processes (the Hub elevates for the same reason)
-- `osConfLib.dll` for live apply. The app looks for it next to the executable first, then in
-  `C:\Program Files\MCHOSE HUB\libs`. Copy it next to the executable if you want to uninstall
-  the Hub. Without it, settings are still saved but only take effect after replugging the
-  headset.
+
+Nothing from MCHOSE is needed beyond the driver. Live apply used to require `osConfLib.dll`
+from the Hub; it is now only used when found next to the executable or in
+`C:\Program Files\MCHOSE HUB\libs`. If neither the policy interface nor that library is
+available, settings are still saved and take effect after replugging the headset.
 
 ## Drivers
 
@@ -91,12 +108,14 @@ packages for other models. The driver now ships solely inside the HUB installer.
 dotnet build V9ProControl.csproj
 ```
 
-The executable lands in `bin/Debug/net10.0-windows/` and prompts for elevation when started.
+The executable lands in `bin/Debug/net10.0-windows/win-x64/` and prompts for elevation when
+started. `PublishSingleFile` with `SelfContained` is set in the project file, so a publish
+produces one executable that runs on a machine with no .NET runtime installed.
 
 ## Repository layout
 
 ```
-src/Apo/        audio processing object properties: equalizer, effects, osConfLib interop
+src/Apo/        audio processing object properties: equalizer, effects, live apply
 src/Audio/      Core Audio endpoint discovery, volume and mute
 src/Device/     HID transport, battery, sound mode, driver detection and install
 src/Ui/         dark theme and the equalizer graph control
@@ -110,6 +129,12 @@ MainForm.cs     the single window
   the Hub's toggle does too.
 - Driver packages are not included in this repository; they belong to C-Media/MCHOSE. See
   [Drivers](#drivers) for how to restore them.
-- `osConfLib.dll` writes a debug log into the working directory of whatever process loads it,
-  using an uninitialised filename. It is harmless, but that is where those files come from.
+- `osConfLib.dll`, when present, writes a debug log into the working directory of whatever
+  process loads it, using an uninitialised filename. It is harmless, but that is where those
+  files come from.
+- The policy interface is undocumented, so its vtable slot is confirmed on one Windows build
+  only. The self-check described above is what keeps a mismatch on another build from
+  corrupting settings; it should not be removed.
+- A completely empty FX property store gives the self-check nothing to probe against, so the
+  first run after a driver reinstall may fall back until one value exists.
 - Band centre frequencies are fixed in the APO's DSP. Only the ten gains are adjustable.
