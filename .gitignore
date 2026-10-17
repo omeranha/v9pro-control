@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+
+# Vendor driver packages. These are C-Media/MCHOSE signed binaries that are not ours to
+# redistribute, and they are only needed once to get the device working.
+drivers/
+
+# Vendor firmware images and the patched variants built from them.
+tools/firmware/
+
+# Probe output: registry dumps, window captures and multi-megabyte USB traces, all specific
+# to one machine and one session.
+tools/snapshots/
+
+# Reverse-engineering probes, kept locally only.
+tools/

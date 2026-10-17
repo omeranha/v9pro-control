@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>V9ProControl</RootNamespace>
+    <AssemblyName>V9ProControl</AssemblyName>
+    <!--
+      Built as x64 to match the headset's 64-bit audio stack. PlatformTarget alone is enough:
+      restricting <Platforms> to x64 leaves the project with no "Any CPU" configuration, which
+      is what made Visual Studio fail to resolve the output path.
+    -->
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+</Project>
