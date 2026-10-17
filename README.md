@@ -63,32 +63,27 @@ usage page `0xFF90`, exchanged with the USB dongle (`src/Device/`).
 
 The headset needs the C-Media CM2025 audio driver. The app checks for it at startup and, if
 none of the known variants is present, offers to install it — nothing is installed without
-your confirmation.
+your confirmation. It adds the base driver, the extension and the APO in that order and tells
+you if Windows wants a reboot.
 
-`drivers/` is not tracked here: it is 54 MB of C-Media/MCHOSE signed binaries that are not
-mine to redistribute. To populate it yourself:
+Driver files are taken from an installed MCHOSE HUB (`libs/<model>`), or from a `drivers/`
+folder in the project if you have one. `drivers/` is not tracked here: those are C-Media and
+MCHOSE signed binaries that are not mine to redistribute.
 
-```
-powershell -ExecutionPolicy Bypass -File scripts/fetch-drivers.ps1
-```
-
-That copies the payload out of an installed MCHOSE HUB and checks every file against
-`scripts/driver-manifest.json`. Add `-Verify` to check an existing copy without writing, or
-`-From Installer -InstallerPath <setup.exe>` to pull it out of a downloaded HUB installer
-instead (needs 7-Zip). The app can also install straight from an installed HUB, so this step
-is optional.
-
-Note that the same hardware ships under more than one driver package: a machine may be running
+The same hardware ships under more than one package: a machine may be running
 `mchose_v9_pro.inf` or the generic C-Media `blk2025ghs.inf`, and both work. The app treats any
 known variant as installed rather than forcing the MCHOSE-branded one over a working driver.
 
-There is no standalone driver download to point at any more. MCHOSE's support pages say the
-previous V9/V9 Pro driver is no longer offered, and the model has been dropped from their live
-update manifest — `cdn.mchose.com.cn/OTA/PC/prod/otaFile/otaConfigApp_prod.json` lists V9
-TURBO, V9 TURBO+ and V9 PRO 2 but no V9 PRO, and the only driver installers hosted there are
-THX APO packages for other models. The driver now ships solely inside the HUB installer, under
-`libs/<model>`. The manifest records SHA256 for all 25 files across `V9_PRO`, `S9_PRO` and
-`S9_PRO_14429` so you can confirm you got the same payload this project was built against.
+Two things to expect after a fresh install. Windows does not create the audio endpoint until
+the device re-enumerates, so replug the dongle or reboot if effects stay unavailable — the app
+retries on its own once the endpoint appears. And a new install recreates the effect settings
+from defaults, so your equalizer curve will be flat again.
+
+There is no standalone driver download to point at. MCHOSE's support pages say the previous
+V9/V9 Pro driver is no longer offered, and the model has been dropped from their live update
+manifest — `cdn.mchose.com.cn/OTA/PC/prod/otaFile/otaConfigApp_prod.json` lists V9 TURBO,
+V9 TURBO+ and V9 PRO 2 but no V9 PRO, and the only driver installers hosted there are THX APO
+packages for other models. The driver now ships solely inside the HUB installer.
 
 ## Build and run
 
@@ -106,7 +101,6 @@ src/Audio/      Core Audio endpoint discovery, volume and mute
 src/Device/     HID transport, battery, sound mode, driver detection and install
 src/Ui/         dark theme and the equalizer graph control
 MainForm.cs     the single window
-scripts/        helper to populate the untracked drivers folder
 ```
 
 ## Notes and limits
