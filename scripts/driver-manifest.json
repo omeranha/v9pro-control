@@ -1,0 +1,137 @@
+{
+    "description":  "SHA256 of the C-Media/MCHOSE driver payload shipped inside the MCHOSE HUB installer, under libs/\u003cmodel\u003e. Used by fetch-drivers.ps1 to verify a locally obtained copy. No driver content is stored here.",
+    "source":  "MCHOSE HUB 1.2.05, libs/\u003cmodel\u003e",
+    "models":  {
+                   "V9_PRO":  [
+                                  {
+                                      "path":  "01_EXTENSION/CMExt.cat",
+                                      "size":  10878,
+                                      "sha256":  "8C3BB42A3356EC3BBF5736EBBB61E59968965ECD9E9D1A6A6C08B776ACDB0C5B"
+                                  },
+                                  {
+                                      "path":  "01_EXTENSION/MCHOSE_V9_PRO_Ext.inf",
+                                      "size":  27223,
+                                      "sha256":  "BEAA72F7FA8B3C6ED2ACC02D030C6904F91E439F8F3D282606BD66B293463FF6"
+                                  },
+                                  {
+                                      "path":  "02_APO/CMAPO.cat",
+                                      "size":  11298,
+                                      "sha256":  "14B8FC01101732BA0B7F6F237AD141BEAAD4864476097F537E528EC259EDCD5E"
+                                  },
+                                  {
+                                      "path":  "02_APO/CmApoIce.dll",
+                                      "size":  14424064,
+                                      "sha256":  "AC636154FC58511A211BFD6B036BD8956B6A3977F10D0BF3644119B4F2553AD0"
+                                  },
+                                  {
+                                      "path":  "02_APO/MCHOSE_V9_PRO_APO.inf",
+                                      "size":  36228,
+                                      "sha256":  "57128C342EEB9650C5BC80996DAA6EC1FA1E507B96767192D92289ACD45DCFE8"
+                                  },
+                                  {
+                                      "path":  "CM2025_Driver_V11.1.1.0_MCHOSE_V9_PRO/mchose_v9_pro.cat",
+                                      "size":  43170,
+                                      "sha256":  "ACDCF053C08C6850918DDD5AA15826877664F674BD6DFBE8DC623E79449E3977"
+                                  },
+                                  {
+                                      "path":  "CM2025_Driver_V11.1.1.0_MCHOSE_V9_PRO/MCHOSE_V9_PRO.Inf",
+                                      "size":  12017,
+                                      "sha256":  "939D37AEA100FFBEFEE983ADF141DBFF82FA66AC1FAFCA23C0D28972846A38F9"
+                                  },
+                                  {
+                                      "path":  "CM2025_Driver_V11.1.1.0_MCHOSE_V9_PRO/x64/MCHOSE_V9_PRO.sys",
+                                      "size":  3518768,
+                                      "sha256":  "7B451A5EC79D7DDD02083AF153D77D5F46536F161F3DB80341BC90052F0733EA"
+                                  }
+                              ],
+                   "S9_PRO":  [
+                                  {
+                                      "path":  "01_EXTENSION/CMExt.cat",
+                                      "size":  10878,
+                                      "sha256":  "D0AEE47959AD194E736C44D955119A2501947407C972E3E9C1E7D77EE9DF39E5"
+                                  },
+                                  {
+                                      "path":  "01_EXTENSION/MCHOSE_S9_PRO_Ext.inf",
+                                      "size":  27223,
+                                      "sha256":  "EAD82873E1394D257CF9B6C606F50A091B59E879AE5AE0260992D5C6763FEE22"
+                                  },
+                                  {
+                                      "path":  "02_APO/CMAPO.cat",
+                                      "size":  11299,
+                                      "sha256":  "EDB818DEDFCC7793300598A0E79B62F1CF477BAC7940A3D75F82EB9F451B3228"
+                                  },
+                                  {
+                                      "path":  "02_APO/CmApoIce.dll",
+                                      "size":  14424064,
+                                      "sha256":  "AC636154FC58511A211BFD6B036BD8956B6A3977F10D0BF3644119B4F2553AD0"
+                                  },
+                                  {
+                                      "path":  "02_APO/MCHOSE_S9_PRO_APO.inf",
+                                      "size":  36228,
+                                      "sha256":  "AFCD547DA2E6A4C2DD3B922D0BFC73541769AFBAC2E582B0A0E0D029E26CC67D"
+                                  },
+                                  {
+                                      "path":  "CM2025_Driver_V11.1.1.0_Bolutek_MCHOSE_S9_PRO/mchose_s9_pro.cat",
+                                      "size":  43145,
+                                      "sha256":  "ED537D7E04688D961081AF96244AF7974C8117D900FDFDFAF2C810D25FFEBF33"
+                                  },
+                                  {
+                                      "path":  "CM2025_Driver_V11.1.1.0_Bolutek_MCHOSE_S9_PRO/MCHOSE_S9_PRO.Inf",
+                                      "size":  10440,
+                                      "sha256":  "5C0A7A426338844DDEEAE59D3B05B2A0D4D78BAA516AA07A908293FCD625B228"
+                                  },
+                                  {
+                                      "path":  "CM2025_Driver_V11.1.1.0_Bolutek_MCHOSE_S9_PRO/x64/MCHOSE_S9_PRO.sys",
+                                      "size":  3518744,
+                                      "sha256":  "A4F4639E5505E24187C314B821904FCEA5974FA46AB3B0F42794B1D94CD5F0EC"
+                                  }
+                              ],
+                   "S9_PRO_14429":  [
+                                        {
+                                            "path":  "01_EXTENSION/CM2025_BLK2025GHS_Ext.inf",
+                                            "size":  31568,
+                                            "sha256":  "E358D3B5CAEB372F61AF3A2C14EB6CD17E602605D98F0ECCECDFD93A09DA4707"
+                                        },
+                                        {
+                                            "path":  "01_EXTENSION/CMExt.cat",
+                                            "size":  10886,
+                                            "sha256":  "41634902851769B4C79BB32DABA17AB365D03BC707D5E1EB74AC6FF8C4D849B4"
+                                        },
+                                        {
+                                            "path":  "02_APO/CM2025_BLK2025GHS_APO.inf",
+                                            "size":  36354,
+                                            "sha256":  "68D88ECDD5D433FBE172795668F0A4FF5DB86749F2DB4BAF46C823ECEDCBB7E9"
+                                        },
+                                        {
+                                            "path":  "02_APO/CMAPO.cat",
+                                            "size":  11306,
+                                            "sha256":  "4288AC6169DC725885A6F74A55230D178E09C9820D08BBC64D33A3976C597B80"
+                                        },
+                                        {
+                                            "path":  "02_APO/CmApoIce.dll",
+                                            "size":  14423552,
+                                            "sha256":  "3BD03E3275B88C6E6F87FBC37CA02791650D80A793EC8A169FA67FFD1A51AA04"
+                                        },
+                                        {
+                                            "path":  "Driver/blk2025ghs.cat",
+                                            "size":  67336,
+                                            "sha256":  "A1F4F673D2113D08E992DFD4BB1E413D73DA01D76346ED7173B4A8080472545A"
+                                        },
+                                        {
+                                            "path":  "Driver/BLK2025GHS.Inf",
+                                            "size":  12859,
+                                            "sha256":  "06361121C8F3ED563C9DB2433E4470D84188310CA0DC97BEBCAF565F05363E24"
+                                        },
+                                        {
+                                            "path":  "Driver/x64/BLK2025GHS.sys",
+                                            "size":  3514048,
+                                            "sha256":  "F5CF8A1E62594F2F3061DD4E0CE888D3DFFAB91D65001B4A7A583FFC59AAFE89"
+                                        },
+                                        {
+                                            "path":  "Driver/x86/BLK2025GHS.sys",
+                                            "size":  2717488,
+                                            "sha256":  "E328A8AA35D584B8AA5E3CBD8A1A30E13854BF352BE143C59C4576F80348888A"
+                                        }
+                                    ]
+               }
+}
