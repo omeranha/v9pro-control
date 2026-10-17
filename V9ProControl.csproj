@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -8,6 +8,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>V9ProControl</RootNamespace>
     <AssemblyName>V9ProControl</AssemblyName>
+    <ApplicationIcon>control.ico</ApplicationIcon>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <!--
       Built as x64 to match the headset's 64-bit audio stack. PlatformTarget alone is enough:
       restricting <Platforms> to x64 leaves the project with no "Any CPU" configuration, which

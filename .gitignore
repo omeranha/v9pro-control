@@ -5,6 +5,7 @@ obj/
 # Visual Studio
 .vs/
 *.user
+/Properties
 
 # Vendor driver packages. These are C-Media/MCHOSE signed binaries that are not ours to
 # redistribute, and they are only needed once to get the device working.

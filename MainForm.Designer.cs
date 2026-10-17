@@ -141,10 +141,10 @@ partial class MainForm
 		tlpDevice.AutoSize = true;
 		tlpDevice.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 		tlpDevice.ColumnCount = 4;
-		tlpDevice.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpDevice.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpDevice.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpDevice.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpDevice.ColumnStyles.Add(new ColumnStyle());
+		tlpDevice.ColumnStyles.Add(new ColumnStyle());
+		tlpDevice.ColumnStyles.Add(new ColumnStyle());
+		tlpDevice.ColumnStyles.Add(new ColumnStyle());
 		tlpDevice.Controls.Add(lblBattery, 0, 0);
 		tlpDevice.Controls.Add(btnBatteryRefresh, 1, 0);
 		tlpDevice.Controls.Add(lblSoundMode, 2, 0);
@@ -152,19 +152,19 @@ partial class MainForm
 		tlpDevice.Location = new Point(14, 20);
 		tlpDevice.Name = "tlpDevice";
 		tlpDevice.RowCount = 1;
-		tlpDevice.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpDevice.Size = new Size(515, 31);
+		tlpDevice.RowStyles.Add(new RowStyle());
+		tlpDevice.Size = new Size(430, 31);
 		tlpDevice.TabIndex = 0;
 		// 
 		// lblBattery
 		// 
-		// Fixed width inside an auto-sizing column on purpose: the text changes as the battery
-		// is read, and letting the column follow it would shift the Refresh button about.
 		lblBattery.Anchor = AnchorStyles.Left;
 		lblBattery.AutoEllipsis = true;
+		lblBattery.AutoSize = true;
+		lblBattery.Location = new Point(3, 8);
 		lblBattery.Margin = new Padding(3, 3, 12, 3);
 		lblBattery.Name = "lblBattery";
-		lblBattery.Size = new Size(150, 15);
+		lblBattery.Size = new Size(62, 15);
 		lblBattery.TabIndex = 0;
 		lblBattery.Text = "Battery: —";
 		// 
@@ -172,6 +172,7 @@ partial class MainForm
 		// 
 		btnBatteryRefresh.Anchor = AnchorStyles.Left;
 		btnBatteryRefresh.FlatStyle = FlatStyle.Flat;
+		btnBatteryRefresh.Location = new Point(80, 3);
 		btnBatteryRefresh.Margin = new Padding(3, 3, 20, 3);
 		btnBatteryRefresh.Name = "btnBatteryRefresh";
 		btnBatteryRefresh.Size = new Size(75, 25);
@@ -184,6 +185,7 @@ partial class MainForm
 		// 
 		lblSoundMode.Anchor = AnchorStyles.Left;
 		lblSoundMode.AutoSize = true;
+		lblSoundMode.Location = new Point(178, 8);
 		lblSoundMode.Margin = new Padding(3, 3, 8, 3);
 		lblSoundMode.Name = "lblSoundMode";
 		lblSoundMode.Size = new Size(78, 15);
@@ -196,6 +198,7 @@ partial class MainForm
 		cboSoundMode.DropDownStyle = ComboBoxStyle.DropDownList;
 		cboSoundMode.FlatStyle = FlatStyle.Flat;
 		cboSoundMode.Items.AddRange(new object[] { "Game mode 1", "Game mode 2", "Music mode" });
+		cboSoundMode.Location = new Point(267, 4);
 		cboSoundMode.Name = "cboSoundMode";
 		cboSoundMode.Size = new Size(160, 23);
 		cboSoundMode.TabIndex = 3;
@@ -206,10 +209,10 @@ partial class MainForm
 		tlpVolume.AutoSize = true;
 		tlpVolume.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 		tlpVolume.ColumnCount = 4;
-		tlpVolume.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpVolume.ColumnStyles.Add(new ColumnStyle());
 		tlpVolume.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 340F));
-		tlpVolume.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpVolume.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpVolume.ColumnStyles.Add(new ColumnStyle());
+		tlpVolume.ColumnStyles.Add(new ColumnStyle());
 		tlpVolume.Controls.Add(lblOutputVolume, 0, 0);
 		tlpVolume.Controls.Add(trkOutputVolume, 1, 0);
 		tlpVolume.Controls.Add(lblOutputVolumeValue, 2, 0);
@@ -220,37 +223,38 @@ partial class MainForm
 		tlpVolume.Location = new Point(14, 55);
 		tlpVolume.Name = "tlpVolume";
 		tlpVolume.RowCount = 2;
-		tlpVolume.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpVolume.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpVolume.Size = new Size(566, 96);
+		tlpVolume.RowStyles.Add(new RowStyle());
+		tlpVolume.RowStyles.Add(new RowStyle());
+		tlpVolume.Size = new Size(559, 90);
 		tlpVolume.TabIndex = 1;
 		// 
 		// lblOutputVolume
 		// 
 		lblOutputVolume.Anchor = AnchorStyles.Left;
 		lblOutputVolume.AutoSize = true;
+		lblOutputVolume.Location = new Point(3, 15);
 		lblOutputVolume.Margin = new Padding(3, 3, 12, 3);
 		lblOutputVolume.Name = "lblOutputVolume";
-		lblOutputVolume.Size = new Size(90, 15);
+		lblOutputVolume.Size = new Size(88, 15);
 		lblOutputVolume.TabIndex = 0;
 		lblOutputVolume.Text = "Output volume";
 		// 
 		// trkOutputVolume
 		// 
 		trkOutputVolume.Anchor = AnchorStyles.Left;
+		trkOutputVolume.Location = new Point(106, 0);
 		trkOutputVolume.Margin = new Padding(3, 0, 8, 0);
 		trkOutputVolume.Maximum = 100;
 		trkOutputVolume.Name = "trkOutputVolume";
-		trkOutputVolume.Size = new Size(330, 45);
+		trkOutputVolume.Size = new Size(329, 45);
 		trkOutputVolume.TabIndex = 1;
 		trkOutputVolume.TickFrequency = 10;
 		trkOutputVolume.Scroll += OnOutputVolumeScroll;
 		// 
 		// lblOutputVolumeValue
 		// 
-		// Also fixed width: the reading goes from "0%" to "100%", and an auto-sizing column
-		// would nudge the Mute checkbox sideways as the slider moves.
 		lblOutputVolumeValue.Anchor = AnchorStyles.Left;
+		lblOutputVolumeValue.Location = new Point(446, 15);
 		lblOutputVolumeValue.Margin = new Padding(3, 3, 12, 3);
 		lblOutputVolumeValue.Name = "lblOutputVolumeValue";
 		lblOutputVolumeValue.Size = new Size(44, 15);
@@ -262,19 +266,21 @@ partial class MainForm
 		// 
 		lblMicVolume.Anchor = AnchorStyles.Left;
 		lblMicVolume.AutoSize = true;
+		lblMicVolume.Location = new Point(3, 60);
 		lblMicVolume.Margin = new Padding(3, 3, 12, 3);
 		lblMicVolume.Name = "lblMicVolume";
-		lblMicVolume.Size = new Size(73, 15);
+		lblMicVolume.Size = new Size(72, 15);
 		lblMicVolume.TabIndex = 3;
 		lblMicVolume.Text = "Microphone";
 		// 
 		// trkMicVolume
 		// 
 		trkMicVolume.Anchor = AnchorStyles.Left;
+		trkMicVolume.Location = new Point(106, 45);
 		trkMicVolume.Margin = new Padding(3, 0, 8, 0);
 		trkMicVolume.Maximum = 100;
 		trkMicVolume.Name = "trkMicVolume";
-		trkMicVolume.Size = new Size(330, 45);
+		trkMicVolume.Size = new Size(329, 45);
 		trkMicVolume.TabIndex = 4;
 		trkMicVolume.TickFrequency = 10;
 		trkMicVolume.Scroll += OnMicVolumeScroll;
@@ -282,6 +288,7 @@ partial class MainForm
 		// lblMicVolumeValue
 		// 
 		lblMicVolumeValue.Anchor = AnchorStyles.Left;
+		lblMicVolumeValue.Location = new Point(446, 60);
 		lblMicVolumeValue.Margin = new Padding(3, 3, 12, 3);
 		lblMicVolumeValue.Name = "lblMicVolumeValue";
 		lblMicVolumeValue.Size = new Size(44, 15);
@@ -294,6 +301,7 @@ partial class MainForm
 		chkMicMute.Anchor = AnchorStyles.Left;
 		chkMicMute.AutoSize = true;
 		chkMicMute.FlatStyle = FlatStyle.Flat;
+		chkMicMute.Location = new Point(505, 58);
 		chkMicMute.Name = "chkMicMute";
 		chkMicMute.Size = new Size(51, 19);
 		chkMicMute.TabIndex = 6;
@@ -315,11 +323,11 @@ partial class MainForm
 		tlpEffects.AutoSize = true;
 		tlpEffects.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 		tlpEffects.ColumnCount = 5;
-		tlpEffects.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpEffects.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpEffects.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpEffects.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-		tlpEffects.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpEffects.ColumnStyles.Add(new ColumnStyle());
+		tlpEffects.ColumnStyles.Add(new ColumnStyle());
+		tlpEffects.ColumnStyles.Add(new ColumnStyle());
+		tlpEffects.ColumnStyles.Add(new ColumnStyle());
+		tlpEffects.ColumnStyles.Add(new ColumnStyle());
 		tlpEffects.Controls.Add(chkBrightening, 0, 0);
 		tlpEffects.Controls.Add(lblBrighteningLevel, 1, 0);
 		tlpEffects.Controls.Add(numBrighteningLevel, 2, 0);
@@ -341,11 +349,11 @@ partial class MainForm
 		tlpEffects.Location = new Point(14, 22);
 		tlpEffects.Name = "tlpEffects";
 		tlpEffects.RowCount = 4;
-		tlpEffects.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpEffects.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpEffects.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpEffects.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-		tlpEffects.Size = new Size(572, 120);
+		tlpEffects.RowStyles.Add(new RowStyle());
+		tlpEffects.RowStyles.Add(new RowStyle());
+		tlpEffects.RowStyles.Add(new RowStyle());
+		tlpEffects.RowStyles.Add(new RowStyle());
+		tlpEffects.Size = new Size(583, 116);
 		tlpEffects.TabIndex = 0;
 		// 
 		// chkBrightening
@@ -353,6 +361,7 @@ partial class MainForm
 		chkBrightening.Anchor = AnchorStyles.Left;
 		chkBrightening.AutoSize = true;
 		chkBrightening.FlatStyle = FlatStyle.Flat;
+		chkBrightening.Location = new Point(3, 5);
 		chkBrightening.Margin = new Padding(3, 3, 14, 3);
 		chkBrightening.Name = "chkBrightening";
 		chkBrightening.Size = new Size(120, 19);
@@ -364,6 +373,7 @@ partial class MainForm
 		// 
 		lblBrighteningLevel.Anchor = AnchorStyles.Left;
 		lblBrighteningLevel.AutoSize = true;
+		lblBrighteningLevel.Location = new Point(173, 7);
 		lblBrighteningLevel.Margin = new Padding(3, 3, 6, 3);
 		lblBrighteningLevel.Name = "lblBrighteningLevel";
 		lblBrighteningLevel.Size = new Size(52, 15);
@@ -373,6 +383,7 @@ partial class MainForm
 		// numBrighteningLevel
 		// 
 		numBrighteningLevel.Anchor = AnchorStyles.Left;
+		numBrighteningLevel.Location = new Point(234, 3);
 		numBrighteningLevel.Margin = new Padding(3, 3, 14, 3);
 		numBrighteningLevel.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
 		numBrighteningLevel.Name = "numBrighteningLevel";
@@ -386,6 +397,7 @@ partial class MainForm
 		chkVocalClarity.Anchor = AnchorStyles.Left;
 		chkVocalClarity.AutoSize = true;
 		chkVocalClarity.FlatStyle = FlatStyle.Flat;
+		chkVocalClarity.Location = new Point(3, 34);
 		chkVocalClarity.Margin = new Padding(3, 3, 14, 3);
 		chkVocalClarity.Name = "chkVocalClarity";
 		chkVocalClarity.Size = new Size(88, 19);
@@ -397,6 +409,7 @@ partial class MainForm
 		// 
 		lblVocalClarityLevel.Anchor = AnchorStyles.Left;
 		lblVocalClarityLevel.AutoSize = true;
+		lblVocalClarityLevel.Location = new Point(173, 36);
 		lblVocalClarityLevel.Margin = new Padding(3, 3, 6, 3);
 		lblVocalClarityLevel.Name = "lblVocalClarityLevel";
 		lblVocalClarityLevel.Size = new Size(52, 15);
@@ -406,6 +419,7 @@ partial class MainForm
 		// numVocalClarityLevel
 		// 
 		numVocalClarityLevel.Anchor = AnchorStyles.Left;
+		numVocalClarityLevel.Location = new Point(234, 32);
 		numVocalClarityLevel.Margin = new Padding(3, 3, 14, 3);
 		numVocalClarityLevel.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
 		numVocalClarityLevel.Name = "numVocalClarityLevel";
@@ -418,6 +432,7 @@ partial class MainForm
 		// 
 		lblVocalClarityNoise.Anchor = AnchorStyles.Left;
 		lblVocalClarityNoise.AutoSize = true;
+		lblVocalClarityNoise.Location = new Point(306, 36);
 		lblVocalClarityNoise.Margin = new Padding(3, 3, 6, 3);
 		lblVocalClarityNoise.Name = "lblVocalClarityNoise";
 		lblVocalClarityNoise.Size = new Size(103, 15);
@@ -427,6 +442,7 @@ partial class MainForm
 		// numVocalClarityNoise
 		// 
 		numVocalClarityNoise.Anchor = AnchorStyles.Left;
+		numVocalClarityNoise.Location = new Point(450, 32);
 		numVocalClarityNoise.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
 		numVocalClarityNoise.Name = "numVocalClarityNoise";
 		numVocalClarityNoise.Size = new Size(65, 23);
@@ -439,6 +455,7 @@ partial class MainForm
 		chkDynamicBass.Anchor = AnchorStyles.Left;
 		chkDynamicBass.AutoSize = true;
 		chkDynamicBass.FlatStyle = FlatStyle.Flat;
+		chkDynamicBass.Location = new Point(3, 63);
 		chkDynamicBass.Margin = new Padding(3, 3, 14, 3);
 		chkDynamicBass.Name = "chkDynamicBass";
 		chkDynamicBass.Size = new Size(153, 19);
@@ -450,6 +467,7 @@ partial class MainForm
 		// 
 		lblDynamicBassLevel.Anchor = AnchorStyles.Left;
 		lblDynamicBassLevel.AutoSize = true;
+		lblDynamicBassLevel.Location = new Point(173, 65);
 		lblDynamicBassLevel.Margin = new Padding(3, 3, 6, 3);
 		lblDynamicBassLevel.Name = "lblDynamicBassLevel";
 		lblDynamicBassLevel.Size = new Size(52, 15);
@@ -459,6 +477,7 @@ partial class MainForm
 		// numDynamicBassLevel
 		// 
 		numDynamicBassLevel.Anchor = AnchorStyles.Left;
+		numDynamicBassLevel.Location = new Point(234, 61);
 		numDynamicBassLevel.Margin = new Padding(3, 3, 14, 3);
 		numDynamicBassLevel.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
 		numDynamicBassLevel.Name = "numDynamicBassLevel";
@@ -471,6 +490,7 @@ partial class MainForm
 		// 
 		lblDynamicBassCutoff.Anchor = AnchorStyles.Left;
 		lblDynamicBassCutoff.AutoSize = true;
+		lblDynamicBassCutoff.Location = new Point(306, 65);
 		lblDynamicBassCutoff.Margin = new Padding(3, 3, 6, 3);
 		lblDynamicBassCutoff.Name = "lblDynamicBassCutoff";
 		lblDynamicBassCutoff.Size = new Size(135, 15);
@@ -480,6 +500,7 @@ partial class MainForm
 		// numDynamicBassCutoff
 		// 
 		numDynamicBassCutoff.Anchor = AnchorStyles.Left;
+		numDynamicBassCutoff.Location = new Point(450, 61);
 		numDynamicBassCutoff.Maximum = new decimal(new int[] { 400, 0, 0, 0 });
 		numDynamicBassCutoff.Minimum = new decimal(new int[] { 50, 0, 0, 0 });
 		numDynamicBassCutoff.Name = "numDynamicBassCutoff";
@@ -494,6 +515,7 @@ partial class MainForm
 		chkIntelligentVolume.Anchor = AnchorStyles.Left;
 		chkIntelligentVolume.AutoSize = true;
 		chkIntelligentVolume.FlatStyle = FlatStyle.Flat;
+		chkIntelligentVolume.Location = new Point(3, 92);
 		chkIntelligentVolume.Margin = new Padding(3, 3, 14, 3);
 		chkIntelligentVolume.Name = "chkIntelligentVolume";
 		chkIntelligentVolume.Size = new Size(119, 19);
@@ -505,6 +527,7 @@ partial class MainForm
 		// 
 		lblIntelligentVolumeLevel.Anchor = AnchorStyles.Left;
 		lblIntelligentVolumeLevel.AutoSize = true;
+		lblIntelligentVolumeLevel.Location = new Point(173, 94);
 		lblIntelligentVolumeLevel.Margin = new Padding(3, 3, 6, 3);
 		lblIntelligentVolumeLevel.Name = "lblIntelligentVolumeLevel";
 		lblIntelligentVolumeLevel.Size = new Size(52, 15);
@@ -514,6 +537,7 @@ partial class MainForm
 		// numIntelligentVolumeLevel
 		// 
 		numIntelligentVolumeLevel.Anchor = AnchorStyles.Left;
+		numIntelligentVolumeLevel.Location = new Point(234, 90);
 		numIntelligentVolumeLevel.Margin = new Padding(3, 3, 14, 3);
 		numIntelligentVolumeLevel.Name = "numIntelligentVolumeLevel";
 		numIntelligentVolumeLevel.Size = new Size(55, 23);
@@ -525,6 +549,7 @@ partial class MainForm
 		// 
 		lblIntelligentVolumeMode.Anchor = AnchorStyles.Left;
 		lblIntelligentVolumeMode.AutoSize = true;
+		lblIntelligentVolumeMode.Location = new Point(306, 94);
 		lblIntelligentVolumeMode.Margin = new Padding(3, 3, 6, 3);
 		lblIntelligentVolumeMode.Name = "lblIntelligentVolumeMode";
 		lblIntelligentVolumeMode.Size = new Size(38, 15);
@@ -537,6 +562,7 @@ partial class MainForm
 		cboIntelligentVolumeMode.DropDownStyle = ComboBoxStyle.DropDownList;
 		cboIntelligentVolumeMode.FlatStyle = FlatStyle.Flat;
 		cboIntelligentVolumeMode.Items.AddRange(new object[] { "Music: High Dyn.", "Speech: Low Dyn." });
+		cboIntelligentVolumeMode.Location = new Point(450, 90);
 		cboIntelligentVolumeMode.Name = "cboIntelligentVolumeMode";
 		cboIntelligentVolumeMode.Size = new Size(130, 23);
 		cboIntelligentVolumeMode.TabIndex = 17;
@@ -615,6 +641,7 @@ partial class MainForm
 		FormBorderStyle = FormBorderStyle.FixedSingle;
 		MaximizeBox = false;
 		Name = "MainForm";
+		StartPosition = FormStartPosition.CenterScreen;
 		Text = "V9 PRO Control";
 		grpOutput.ResumeLayout(false);
 		grpOutput.PerformLayout();
