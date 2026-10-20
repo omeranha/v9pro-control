@@ -23,6 +23,7 @@ public partial class MainForm : Form
 	private bool _batteryBusy;
 	private bool _fxAvailable;
 	private int _ticksSinceApoRetry;
+	private List<EqualizerProfile> _profiles = new();
 
 	public MainForm()
 	{
@@ -84,6 +85,7 @@ public partial class MainForm : Form
 		_equalizer = new Equalizer(fx, _apo);
 		_effects = new PlaybackEffects(fx, _apo);
 		LoadFxEffects();
+		LoadProfiles();
 
 		SetStatus(_apo.Method switch
 		{
@@ -210,6 +212,12 @@ public partial class MainForm : Form
 		bool equalizer = _fxAvailable && chkEqualizerEnabled.Checked;
 		eqGraph.Enabled = equalizer;
 		btnEqualizerReset.Enabled = equalizer;
+		lblProfile.Enabled = equalizer;
+		cboProfile.Enabled = equalizer && _profiles.Count > 0;
+		btnProfileImport.Enabled = equalizer;
+
+		// Exporting only reads the current curve, so it stays available while the EQ is off.
+		btnProfileExport.Enabled = _fxAvailable;
 
 		bool brightening = _fxAvailable && chkBrightening.Checked;
 		lblBrighteningLevel.Enabled = brightening;
@@ -374,6 +382,9 @@ public partial class MainForm : Form
 	private void OnEqualizerBandChanged(object? sender, EqualizerBandEventArgs e)
 	{
 		if (_suppressEvents || _equalizer is null) { return; }
+
+		// The curve no longer matches whatever profile was picked, so stop claiming it does.
+		ClearProfileSelection();
 		ApplyFxChange(() => _equalizer.SetBand(e.Band, e.GainDb));
 	}
 
@@ -384,6 +395,7 @@ public partial class MainForm : Form
 		_suppressEvents = true;
 		try {
 			eqGraph.SetGains(FlatCurve);
+			cboProfile.SelectedIndex = -1;
 		} finally {
 			_suppressEvents = false;
 		}
@@ -391,6 +403,115 @@ public partial class MainForm : Form
 		ApplyFxChange(() => {
 			for (int i = 0; i < Equalizer.BandCount; i++) { _equalizer.SetBand(i, 0); }
 		});
+	}
+
+	/// <summary>
+	/// Fills the profile list from the folder beside the executable, creating a starting
+	/// profile from the current curve when there is none.
+	/// </summary>
+	private void LoadProfiles()
+	{
+		if (_equalizer is not null) { EqualizerProfiles.EnsureDefault(_equalizer.ReadAllBands()); }
+		_profiles = EqualizerProfiles.LoadAll();
+
+		_suppressEvents = true;
+		try {
+			cboProfile.Items.Clear();
+			foreach (EqualizerProfile profile in _profiles) { cboProfile.Items.Add(profile); }
+			cboProfile.SelectedIndex = IndexOfMatchingProfile();
+		} finally {
+			_suppressEvents = false;
+		}
+
+		UpdateEffectSubOptions();
+	}
+
+	/// <summary>The profile whose gains match the current curve, or -1 when none does.</summary>
+	private int IndexOfMatchingProfile()
+	{
+		int[] current = eqGraph.GetGains();
+		for (int i = 0; i < _profiles.Count; i++) {
+			if (_profiles[i].Gains.AsSpan().SequenceEqual(current)) { return i; }
+		}
+		return -1;
+	}
+
+	private void ClearProfileSelection()
+	{
+		if (cboProfile.SelectedIndex < 0) { return; }
+
+		_suppressEvents = true;
+		try { cboProfile.SelectedIndex = -1; } finally { _suppressEvents = false; }
+	}
+
+	private void OnProfileSelected(object? sender, EventArgs e)
+	{
+		if (_suppressEvents || _equalizer is null || cboProfile.SelectedItem is not EqualizerProfile profile) { return; }
+		ApplyProfile(profile);
+	}
+
+	private void ApplyProfile(EqualizerProfile profile)
+	{
+		if (_equalizer is null) { return; }
+
+		_suppressEvents = true;
+		try { eqGraph.SetGains(profile.Gains); } finally { _suppressEvents = false; }
+
+		ApplyFxChange(() => {
+			for (int i = 0; i < Equalizer.BandCount; i++) { _equalizer.SetBand(i, profile.Gains[i]); }
+		});
+		SetStatus($"Applied profile \u201c{profile.Name}\u201d.");
+	}
+
+	private void OnProfileImport(object? sender, EventArgs e)
+	{
+		using var dialog = new OpenFileDialog {
+			Title = "Import equalizer profile",
+			Filter = "Equalizer profile (*.json)|*.json|All files (*.*)|*.*",
+			InitialDirectory = Directory.Exists(EqualizerProfiles.Directory) ? EqualizerProfiles.Directory : AppContext.BaseDirectory
+		};
+		if (dialog.ShowDialog(this) != DialogResult.OK) { return; }
+
+		EqualizerProfile? profile = EqualizerProfiles.TryLoad(dialog.FileName, out string? error);
+		if (profile is null) {
+			SetStatus($"Could not read that profile: {error}");
+			return;
+		}
+
+		try {
+			// Copy it into the profiles folder so it survives as a selectable entry.
+			EqualizerProfiles.Save(profile, EqualizerProfiles.PathFor(profile.Name));
+		} catch (Exception ex) {
+			SetStatus($"Imported, but could not save it to the profiles folder: {ex.Message}");
+		}
+
+		LoadProfiles();
+		ApplyProfile(profile);
+	}
+
+	private void OnProfileExport(object? sender, EventArgs e)
+	{
+		Directory.CreateDirectory(EqualizerProfiles.Directory);
+		using var dialog = new SaveFileDialog {
+			Title = "Export equalizer profile",
+			Filter = "Equalizer profile (*.json)|*.json",
+			DefaultExt = "json",
+			AddExtension = true,
+			InitialDirectory = EqualizerProfiles.Directory,
+			FileName = cboProfile.SelectedItem is EqualizerProfile selected ? selected.Name : "My profile"
+		};
+		if (dialog.ShowDialog(this) != DialogResult.OK) { return; }
+
+		var profile = new EqualizerProfile(Path.GetFileNameWithoutExtension(dialog.FileName), eqGraph.GetGains());
+		try {
+			EqualizerProfiles.Save(profile, dialog.FileName);
+			SetStatus($"Exported profile \u201c{profile.Name}\u201d.");
+		} catch (Exception ex) {
+			SetStatus($"Could not write that file: {ex.Message}");
+			return;
+		}
+
+		LoadProfiles();
 	}
 
 	private void OnBrighteningChanged(object? sender, EventArgs e)

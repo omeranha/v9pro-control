@@ -52,6 +52,9 @@ internal sealed class EqualizerGraph : Control
 
 	public int GetGain(int band) => _gains[band];
 
+	/// <summary>Snapshot of all bands, for saving a profile.</summary>
+	public int[] GetGains() => (int[])_gains.Clone();
+
 	/// <summary>Loads all bands without raising BandChanged, for syncing from the registry.</summary>
 	public void SetGains(IReadOnlyList<int> gains)
 	{

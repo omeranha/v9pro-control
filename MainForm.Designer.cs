@@ -32,6 +32,11 @@ partial class MainForm
 	private System.Windows.Forms.CheckBox chkEqualizerEnabled;
 	private System.Windows.Forms.Button btnEqualizerReset;
 	private V9ProControl.Ui.EqualizerGraph eqGraph;
+	private System.Windows.Forms.TableLayoutPanel tlpProfiles;
+	private System.Windows.Forms.Label lblProfile;
+	private System.Windows.Forms.ComboBox cboProfile;
+	private System.Windows.Forms.Button btnProfileImport;
+	private System.Windows.Forms.Button btnProfileExport;
 
 	private System.Windows.Forms.GroupBox grpEffects;
 	private System.Windows.Forms.TableLayoutPanel tlpEffects;
@@ -107,6 +112,11 @@ partial class MainForm
 		chkEqualizerEnabled = new CheckBox();
 		btnEqualizerReset = new Button();
 		eqGraph = new V9ProControl.Ui.EqualizerGraph();
+		tlpProfiles = new TableLayoutPanel();
+		lblProfile = new Label();
+		cboProfile = new ComboBox();
+		btnProfileImport = new Button();
+		btnProfileExport = new Button();
 		lblStatus = new Label();
 		tmrRefresh = new System.Windows.Forms.Timer(components);
 		grpOutput.SuspendLayout();
@@ -123,6 +133,7 @@ partial class MainForm
 		((System.ComponentModel.ISupportInitialize)numDynamicBassCutoff).BeginInit();
 		((System.ComponentModel.ISupportInitialize)numIntelligentVolumeLevel).BeginInit();
 		grpEqualizer.SuspendLayout();
+		tlpProfiles.SuspendLayout();
 		SuspendLayout();
 		// 
 		// grpOutput
@@ -573,9 +584,10 @@ partial class MainForm
 		grpEqualizer.Controls.Add(chkEqualizerEnabled);
 		grpEqualizer.Controls.Add(btnEqualizerReset);
 		grpEqualizer.Controls.Add(eqGraph);
+		grpEqualizer.Controls.Add(tlpProfiles);
 		grpEqualizer.Location = new Point(12, 346);
 		grpEqualizer.Name = "grpEqualizer";
-		grpEqualizer.Size = new Size(600, 228);
+		grpEqualizer.Size = new Size(600, 268);
 		grpEqualizer.TabIndex = 2;
 		grpEqualizer.TabStop = false;
 		grpEqualizer.Text = "Equalizer";
@@ -616,10 +628,74 @@ partial class MainForm
 		eqGraph.TabIndex = 2;
 		eqGraph.BandChanged += OnEqualizerBandChanged;
 		// 
+		// tlpProfiles
+		// 
+		tlpProfiles.AutoSize = true;
+		tlpProfiles.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+		tlpProfiles.ColumnCount = 4;
+		tlpProfiles.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpProfiles.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpProfiles.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpProfiles.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+		tlpProfiles.Controls.Add(lblProfile, 0, 0);
+		tlpProfiles.Controls.Add(cboProfile, 1, 0);
+		tlpProfiles.Controls.Add(btnProfileImport, 2, 0);
+		tlpProfiles.Controls.Add(btnProfileExport, 3, 0);
+		tlpProfiles.Location = new Point(14, 224);
+		tlpProfiles.Name = "tlpProfiles";
+		tlpProfiles.RowCount = 1;
+		tlpProfiles.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+		tlpProfiles.Size = new Size(406, 31);
+		tlpProfiles.TabIndex = 3;
+		// 
+		// lblProfile
+		// 
+		lblProfile.Anchor = AnchorStyles.Left;
+		lblProfile.AutoSize = true;
+		lblProfile.Margin = new Padding(3, 3, 8, 3);
+		lblProfile.Name = "lblProfile";
+		lblProfile.Size = new Size(44, 15);
+		lblProfile.TabIndex = 0;
+		lblProfile.Text = "Profile";
+		// 
+		// cboProfile
+		// 
+		cboProfile.Anchor = AnchorStyles.Left;
+		cboProfile.DropDownStyle = ComboBoxStyle.DropDownList;
+		cboProfile.FlatStyle = FlatStyle.Flat;
+		cboProfile.Margin = new Padding(3, 3, 20, 3);
+		cboProfile.Name = "cboProfile";
+		cboProfile.Size = new Size(180, 23);
+		cboProfile.TabIndex = 1;
+		cboProfile.SelectedIndexChanged += OnProfileSelected;
+		// 
+		// btnProfileImport
+		// 
+		btnProfileImport.Anchor = AnchorStyles.Left;
+		btnProfileImport.FlatStyle = FlatStyle.Flat;
+		btnProfileImport.Margin = new Padding(3, 3, 8, 3);
+		btnProfileImport.Name = "btnProfileImport";
+		btnProfileImport.Size = new Size(75, 25);
+		btnProfileImport.TabIndex = 2;
+		btnProfileImport.Text = "Import";
+		btnProfileImport.UseVisualStyleBackColor = true;
+		btnProfileImport.Click += OnProfileImport;
+		// 
+		// btnProfileExport
+		// 
+		btnProfileExport.Anchor = AnchorStyles.Left;
+		btnProfileExport.FlatStyle = FlatStyle.Flat;
+		btnProfileExport.Name = "btnProfileExport";
+		btnProfileExport.Size = new Size(75, 25);
+		btnProfileExport.TabIndex = 3;
+		btnProfileExport.Text = "Export";
+		btnProfileExport.UseVisualStyleBackColor = true;
+		btnProfileExport.Click += OnProfileExport;
+		// 
 		// lblStatus
 		// 
 		lblStatus.ForeColor = Color.DimGray;
-		lblStatus.Location = new Point(14, 584);
+		lblStatus.Location = new Point(14, 624);
 		lblStatus.Name = "lblStatus";
 		lblStatus.Size = new Size(596, 15);
 		lblStatus.TabIndex = 3;
@@ -633,7 +709,7 @@ partial class MainForm
 		// 
 		AutoScaleDimensions = new SizeF(7F, 15F);
 		AutoScaleMode = AutoScaleMode.Font;
-		ClientSize = new Size(624, 610);
+		ClientSize = new Size(624, 651);
 		Controls.Add(grpOutput);
 		Controls.Add(grpEffects);
 		Controls.Add(grpEqualizer);
@@ -663,6 +739,8 @@ partial class MainForm
 		((System.ComponentModel.ISupportInitialize)numIntelligentVolumeLevel).EndInit();
 		grpEqualizer.ResumeLayout(false);
 		grpEqualizer.PerformLayout();
+		tlpProfiles.ResumeLayout(false);
+		tlpProfiles.PerformLayout();
 		ResumeLayout(false);
 	}
 }
