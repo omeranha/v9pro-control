@@ -21,6 +21,7 @@ nothing from MCHOSE but the driver.
 | Vocal clarity | On/off, intensity and noise suppression |
 | Dynamic low frequency | On/off, intensity and band segmentation in Hz |
 | Intelligent volume | On/off, intensity and dynamics mode |
+| Equalizer profiles | Saved as JSON, interchangeable with Hub exports |
 | Battery level | Read from the headset on demand |
 | Sound mode | Game 1, Game 2, Music |
 
@@ -102,6 +103,37 @@ manifest — `cdn.mchose.com.cn/OTA/PC/prod/otaFile/otaConfigApp_prod.json` list
 V9 TURBO+ and V9 PRO 2 but no V9 PRO, and the only driver installers hosted there are THX APO
 packages for other models. The driver now ships solely inside the HUB installer.
 
+## Equalizer profiles
+
+Profiles are JSON files in a `profiles` folder beside the executable, in the shape MCHOSE HUB
+exports, so files can be exchanged with it:
+
+```json
+{
+  "name": "Bass boost",
+  "data": [ -4, -3, -2, -1, 0, 1, 2, 0, 0, 0 ]
+}
+```
+
+Choosing one from the dropdown applies all ten bands at once, live, like any other change.
+`Import` copies a file into the folder and applies it, so it persists as a selectable entry.
+`Export` writes the current curve, and stays available while the equalizer is switched off
+because it only reads.
+
+On a first run, when the folder holds no profiles, a `Default` profile is written from the
+*current* curve rather than from a flat line, so existing settings become the starting point
+instead of being discarded.
+
+Nothing in a file is trusted. `data` is padded or truncated to the ten bands this equalizer
+has, since a Hub export may carry a different count; values are rounded, in case they are
+written with a decimal point; and each is clamped to ±20 dB. A file with no `name` falls back
+to its filename. An unreadable file is skipped with its parse error reported, so one bad file
+cannot hide the rest of the list. Profile names are sanitised when used as filenames.
+
+Editing a band or pressing `Flat` clears the selection, because the curve no longer matches the
+named profile. If the curve happens to equal a stored profile when the app starts, that one is
+preselected.
+
 ## Build and run
 
 ```
@@ -115,11 +147,12 @@ produces one executable that runs on a machine with no .NET runtime installed.
 ## Repository layout
 
 ```
-src/Apo/        audio processing object properties: equalizer, effects, live apply
+src/Apo/        audio processing object properties: equalizer, effects, profiles, live apply
 src/Audio/      Core Audio endpoint discovery, volume and mute
 src/Device/     HID transport, battery, sound mode, driver detection and install
 src/Ui/         dark theme and the equalizer graph control
 MainForm.cs     the single window
+profiles/       equalizer profiles, created beside the executable at runtime
 ```
 
 ## Notes and limits
