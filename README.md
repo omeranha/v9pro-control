@@ -3,6 +3,9 @@
 A small native Windows app that controls an **MCHOSE V9 PRO** wireless headset, written to
 replace the vendor's MCHOSE HUB.
 
+<img width="625" height="680" alt="image" src="https://github.com/user-attachments/assets/6ff06318-4ec6-446c-ab43-28dde199b45b" />
+
+
 ## Why
 
 MCHOSE HUB works, but it is an Electron app that fetches its entire interface from
